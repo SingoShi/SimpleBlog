@@ -1,0 +1,15 @@
+
+1. python-setuptools
+yum install python-setuptools
+
+2. web.py
+easy_install web.py
+
+3. supervisor
+essy_install supervisor
+
+4. markdown
+easy_install markdown
+
+5. pytz
+easy_install pytz

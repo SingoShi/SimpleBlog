@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:ng="http://angularjs.org" id="ng-app" ng-app="SimpleBlog">
+  <head>
+    <title>{{ blogSetting.blogTitle }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="%path%css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="%path%css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="%path%css/style.css" media="screen" />
+    <script src="%path%js/angular.min.js"></script>
+    <script src="%path%js/angular-cookies.min.js"></script>
+    <script src="%path%js/markdown.js"></script>
+    <script src="%path%js/simpleBlog.js"></script>
+    <script type="text/ng-template" id="header.tpl">
+      <div class="row">
+        <h3 class="text-center title">To Be a <a ng-click="login()">S</a>imple <a ng-click="logout()">C</a>oder</h3>
+      </div>
+      <div class="row navigation">
+        <div class="col-md-9 horizontal-no-padding pull-left" ng-controller="navCrl">
+          <ul class="nav nav-pills">
+            <li ng-repeat="nav in navSetting" 
+              ng-clock 
+              ng-hide="nav.name == 'New' && !auth"
+              ng-class="nav.selected"><a ng-href="{{nav.href}}">{{ nav.name }}</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3 horizontal-no-padding" ng-controller="searchCrl">
+          <a class="glyphicon glyphicon-search pull-right" style="margin-top: 13px;" ng-show="showIcon" ng-click="clickSearchIcon()"></a>
+          <div class="dropdown pull-right" ng-cloak ng-hide="showIcon">
+            <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search"> 
+            <ul class="dropdown-menu" ng-click="leaveSearchBox()">
+              <li ng-repeat="result in searchResults"><a ng-cloak>{{ result }}</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="edit.tpl">
+      <div>
+        <div class="row">
+          <textarea class="edit-post-box" ng-style="textareaHeight" ng-model="editContent" ng-change="textChange()"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn btn-default pull-right edit-post-button" ng-click="savePost()">Save</button>
+        </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="archive.tpl">
+      <div class="row archive-main" ng-repeat="archive in archives">
+        <div class="col-md-2">{{archive.postDate}}</div>
+        <div class="col-md-10"><a ng-href="post/{{archive.postId}}.html">{{archive.postTitle}}</a><i ng-cloak ng-show="archive.status != 'public'" class="under-modify fa fa-pencil-square-o"></i></div>
+      </div>
+      <div class="row">
+        <ul class="pager">
+          <li class="previous" ng-cloak ng-show="!disablePrevious"><a ng-click="ClickPrevious()">Previous</a></li>
+          <li class="next" ng-cloak ng-show="!disableNext"><a ng-click="ClickNext()">Next</a></li>
+        </ul>
+      </div>
+    </script>
+    <script type="text/ng-template" id="post.tpl">
+      <div class="row center text-center" ng-cloak ng-show="showPost"><h3>{{post.title}}<i ng-cloak ng-show="showPencil" class="under-modify fa fa-pencil-square-o"></i></h3></div>
+      <div class="row post-body" ng-bind-html="post.htmlBody" ng-cloak ng-show="showPost"></div>
+      <div class="row post-footer text-center" ng-cloak ng-show="showPost">
+        <p>
+          <span ng-cloak ng-show="auth">| <a ng-href="{{editURI}}">Edit</a></span>
+          <span>| Post on {{post.postDate}}</span>
+          <span ng-show="visitCount">| Visit({{visitCount}})</span> 
+          <span>| <a ng-click="crtReplyView()">Reply</a></span>
+          |
+        </p>
+      </div>
+      <div class="post-replies" ng-cloak ng-show="showReply">
+        <div class="row reply">
+          <form class="form-inline" role="form">
+            <div class="form-group col-md-2 reply-user">
+              <label class="sr-only">name</label>
+              <input type="text" class="form-control" placeholder="Name" ng-model="username">
+            </div>
+            <div class="form-group col-md-9 reply-content">
+              <label class="sr-only">reply</label>
+              <input type="text" class="form-control" placeholder="Your reply" ng-model="replyContent">
+            </div>
+            <div class="col-md-1 horizontal-no-padding">
+              <button class="btn btn-default" ng-click="postComments()">Reply</button>
+            </div>
+          </form>
+        </div>
+        <div class="row" 
+          ng-repeat="comment in comments"
+          ng-class="{comments: !$last, comments-noborder: $last}">
+          <div class="comment-main col-md-11">
+            <span class="comment-user">{{ comment.username }}</span>
+            <span class="comment-content">{{ comment.content }} -- {{ comment.date }}</span>
+          </div>
+          <div class="comment-reply col-md-1 horizontal-no-padding">
+            <button class="btn btn-default" ng-click="replyUser()">Reply</button>
+          </div>
+        </div>     
+      </div>
+    </script>
+    <script type="text/ng-template" id="modal.tpl">
+      <div class="mask-layer"></div>
+      <div class="popup-layer">
+        <div class="popup container">
+          <form class="form-horizontal" role="form">
+            <div class="form-group">
+              <label class="sr-only">Username</label>
+              <div class="col-sm-12">
+                <input type="text" class="form-control" placeholder="Username" ng-model="username">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="sr-only">Password</label>
+              <div class="col-sm-12">
+                <input type="password" class="form-control" placeholder="Password" ng-model="password">
+              </div>
+            </div>
+            <div >
+              <button type="button" class="btn common-btn pull-left" ng-click="cancelModal()">Cancel</button>
+              <button type="button" class="btn common-btn pull-right" ng-click="signin()">Signin</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </script>
+  </head>
+  <xmp style="display: none" id="blogSetting">
+    %blogSetting%
+  </xmp>
+  <xmp style="display: none" id="pageData">
+    %pageData%
+  </xmp>
+  <body>
+    <div ng-controller="blogBodyCrl"
+      ng-dblclick="leaveSearchBox()">
+        <div class="container">
+          <div class="header" 
+            ng-include="'header.tpl'"></div>
+          <div class="about" 
+            ng-cloak 
+            ng-show="pageData.type == 'about'"
+            ng-bind-html="about"
+            ng-controller="aboutCrl">
+          </div>
+          <div class="post" 
+            ng-cloak 
+            ng-show="pageData.type == 'post'"
+            ng-include="'post.tpl'" 
+            ng-controller="postCrl">
+          </div>
+          <div class="archives" 
+            ng-cloak 
+            ng-show="pageData.type == 'archive'"
+            ng-include="'archive.tpl'" 
+            ng-controller="archiveCrl">
+          </div>
+          <div class="edit-post" 
+            ng-cloak 
+            ng-show="pageData.type == 'edit'" 
+            ng-include="'edit.tpl'" 
+            ng-controller="editPostCrl">
+          </div>
+          <div class="row footer">
+            <p class="text-center" ng-cloak>Designed on Bootstrap by &copy; {{ blogSetting.blogOwner }}</p>
+          </div>
+        </div>
+        <div class="modal-div" 
+          ng-cloak 
+          ng-show="showModel"
+          ng-include="'modal.tpl'">
+        </div>
+      </div>
+  </body>
+</html>
