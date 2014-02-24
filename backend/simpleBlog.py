@@ -365,12 +365,17 @@ class Search(SimpleBlog):
             'keyList': []
         }
         if not filter:
-            for keyword, value in Setting.index['categories'].iteritems():
-                if value:
-                    ret['keyList'].append(keyword)
+            searchIdx = Setting.index['categories']
         else:
-            for keyword, value in Setting.index['keywords'].iteritems():
-                if filter in keyword and value:
+            searchIdx = Setting.index['keywords']
+        for keyword, value in searchIdx.iteritems():
+            if value and filter in keyword:
+                if web.ctx.session.has_key('login') and web.ctx.session.login:
                     ret['keyList'].append(keyword)
+                else:
+                    for file in value:
+                        if file.endswith('.md'):
+                            ret['keyList'].append(keyword)
+                            break 
         return json.dumps(ret)
 
