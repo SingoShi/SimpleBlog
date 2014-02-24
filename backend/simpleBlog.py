@@ -130,6 +130,20 @@ class SimpleBlog():
         })
         return Setting.template.replace("%path%", "").replace("%pageData%", about)
 
+    def genMeta(self, mdMeta):
+        meta = {}
+        for key, value in mdMeta.iteritems():
+            tmp = value[0].strip() if value else ''
+            if key in ['category', 'tags']:
+                meta[key] = []
+                for word in tmp.split(' '):
+                    word = word.strip()
+                    if word:
+                        meta[key].append(word)
+            else:
+                meta[key] = tmp
+        return meta
+
     def getPostMeta(self, postFile):
         if not postFile:
             return "", {}, ""
@@ -137,13 +151,7 @@ class SimpleBlog():
         content = readFile(postFile).decode('utf-8')
         md = Markdown(extensions=["meta"])
         md.convert(content)
-        meta = {}
-        for key, value in md.Meta.iteritems():
-            tmp = value[0] if value else ''
-            if key in ['category', 'tags']:
-                meta[key] = tmp.split(' ')
-            else:
-                meta[key] = tmp
+        meta = self.genMeta(md.Meta)
         return postId, meta, content
 
     def genHomePage(self):
@@ -268,7 +276,8 @@ class SavePost(SimpleBlog):
                 postId = str(int(param['postId']))
                 postContent = param['postContent'].encode('utf-8')
             except:
-               return json.dumps(InputError)
+                logging.error("%s", traceback.format_exc())
+                return json.dumps(InputError)
 
             if os.path.exists('%s/frontend/md/%s.md' % (ProjectPath, postId)):
                 oldStatus = 'public'
@@ -281,19 +290,15 @@ class SavePost(SimpleBlog):
                     oldMeta = {}
             try:
                 md = Markdown(extensions=["meta"])
-                md.convert(postContent)
-                meta = {}
-                for key, value in md.Meta.iteritems():
-                    tmp = value[0] if value else ''
-                    if not tmp and key in ["category", "tags", "date", "title"]:
+                md.convert(postContent.decode('utf-8'))
+                meta = self.genMeta(md.Meta)
+                for key in ["category", "tags", "date", "title", "status"]:
+                    if not meta.has_key(key) or not meta[key]:
                         raise ValueError("input error")
-                    if key == "status" and tmp not in ["public", "private"]:
+                    if key == "status" and meta[key] not in ["public", "private"]:
                         raise ValueError("input error")
-                    if key in ['category', 'tags']:
-                        meta[key] = tmp.split(' ')
-                    else:
-                        meta[key] = tmp
             except:
+                logging.error("%s", traceback.format_exc())
                 return json.dumps(MetaError)
 
             status = meta['status'] if meta.has_key('status') else 'private'
