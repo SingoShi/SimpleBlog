@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:ng="http://angularjs.org" id="ng-app" ng-app="SimpleBlog">
+<html xmlns:ng="http://angularjs.org" id="ng-app" ng-app="SimpleBlog">
   <head>
     <title>{{ blogSetting.blogTitle }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -28,9 +28,9 @@
         <div class="col-md-3 horizontal-no-padding" ng-controller="searchCrl">
           <a class="glyphicon glyphicon-search pull-right" style="margin-top: 13px;" ng-show="showIcon" ng-click="clickSearchIcon()"></a>
           <div class="dropdown pull-right" ng-cloak ng-hide="showIcon">
-            <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search"> 
-            <ul class="dropdown-menu" ng-click="leaveSearchBox()">
-              <li ng-repeat="result in searchResults"><a ng-cloak>{{ result }}</a></li>
+            <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search" ng-model="searchText" ng-change="textChange()"> 
+            <ul class="dropdown-menu" ng-cloak ng-show="showDropdown" ng-click="leaveSearchBox()">
+              <li ng-repeat="result in searchResults"><a ng-href="%path%archive.html?filter={{ result }}">{{ result }}</a></li>
             </ul>
           </div>
         </div>

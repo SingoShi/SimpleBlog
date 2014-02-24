@@ -12,6 +12,7 @@ Success = { "error": 0 }
 AuthError = { "error": 1 }
 SaveError = { "error": 2 }
 MetaError = { "error": 4 }
+InputError = { "error": 8 }
 
 #############################################################################
 
@@ -133,15 +134,16 @@ class SimpleBlog():
         if not postFile:
             return "", {}, ""
         postId = postFile.split('/')[-1].split('.')[0]
-        content = readFile(postFile)
+        content = readFile(postFile).decode('utf-8')
         md = Markdown(extensions=["meta"])
         md.convert(content)
         meta = {}
         for key, value in md.Meta.iteritems():
+            tmp = value[0] if value else ''
             if key in ['category', 'tags']:
-                meta[key] = value
+                meta[key] = tmp.split(' ')
             else:
-                meta[key] = value[0] if value and len(value) == 1 else ''
+                meta[key] = tmp
         return postId, meta, content
 
     def genHomePage(self):
@@ -262,12 +264,15 @@ class SavePost(SimpleBlog):
         web.header('Content-Type', 'application/json')
         try:
             param = json.loads(web.data())
-            postId = param['postId']
-            postContent = param['postContent']
+            try:
+                postId = str(int(param['postId']))
+                postContent = param['postContent'].encode('utf-8')
+            except:
+               return json.dumps(InputError)
+
             if os.path.exists('%s/frontend/md/%s.md' % (ProjectPath, postId)):
                 oldStatus = 'public'
                 postId, oldMeta, tmp = self.getPostMeta('%s/frontend/md/%s.md' % (ProjectPath, postId))
-
             else:
                 oldStatus = 'private'
                 if os.path.exists('%s/frontend/md/%s.md_' % (ProjectPath, postId)):
@@ -279,14 +284,15 @@ class SavePost(SimpleBlog):
                 md.convert(postContent)
                 meta = {}
                 for key, value in md.Meta.iteritems():
+                    tmp = value[0] if value else ''
+                    if not tmp and key in ["category", "tags", "date", "title"]:
+                        raise ValueError("input error")
+                    if key == "status" and tmp not in ["public", "private"]:
+                        raise ValueError("input error")
                     if key in ['category', 'tags']:
-                        meta[key] = value
+                        meta[key] = tmp.split(' ')
                     else:
-                        meta[key] = value[0] if value and len(value) == 1 else ''
-                    if not meta[key] and key in ["category", "tags", "date", "title"]:
-                        raise ValueError("input error")
-                    if key == "status" and meta[key] not in ["public", "private"]:
-                        raise ValueError("input error")
+                        meta[key] = tmp
             except:
                 return json.dumps(MetaError)
 
@@ -342,6 +348,24 @@ class GetArchivePage(SimpleBlog):
 class Comment():
     pass
 
-class Search():
-    pass
+class Search(SimpleBlog):
+    def GET(self):
+        web.header('Content-Type', 'application/json')
+        param = web.input()
+        filter = param['filter'] if param.has_key('filter') else ''
+        if Setting.index == None:
+            self.buildIndex()
+        ret = {
+            'error': 0,
+            'keyList': []
+        }
+        if not filter:
+            for keyword, value in Setting.index['categories'].iteritems():
+                if value:
+                    ret['keyList'].append(keyword)
+        else:
+            for keyword, value in Setting.index['keywords'].iteritems():
+                if filter in keyword and value:
+                    ret['keyList'].append(keyword)
+        return json.dumps(ret)
 

@@ -127,7 +127,7 @@
         'error': int
     }
 
-## 6 RSS
+## 5 RSS
 
-### 6.1 RSS
+### 5.1 RSS
     

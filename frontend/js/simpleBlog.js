@@ -65,7 +65,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
                 }).success(function(data, status, headers, config) {
                     $scope.showModel = false;
                     if (status == 200) {
-                        ret = angular.fromJson(data);
+                        var ret = angular.fromJson(data);
                         if(ret.error == 0) {
                             $scope.auth = true;
                         }
@@ -79,15 +79,44 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
             msgBus.emitMsg('leaveSearchBox');
         }
     }])
-    .controller('searchCrl', ['$scope', '$log', 'msgBus', function($scope, $log, msgBus) {
-        $scope.searchResults = ['linux', 'c/c++', 'javascript', 'python', 'tcp/ip'];
+    .controller('searchCrl', ['$scope', '$log', '$http', 'msgBus', function($scope, $log, $http, msgBus) {
+        $scope.searchResults = [];
+        $scope.showDropdown = false;
         $scope.showIcon = true;
         $scope.leaveSearchBox = function() {
             $scope.showIcon = true;
         };
         $scope.clickSearchIcon = function() {
             $scope.showIcon = false;
+            $http({
+                method: 'GET', 
+                url: $scope.blogSetting.domain + '/search'
+            }).success(function(data, status, headers, config) {
+                if (status == 200) {
+                    var ret = angular.fromJson(data);
+                    if(ret.error == 0) {
+                        $scope.searchResults = ret.keyList;
+                        $scope.showDropdown = $scope.searchResults.length > 0;
+                    }
+                }
+            });
         };
+        $scope.textChange = function() {
+            $http({
+                method: 'GET', 
+                url: $scope.blogSetting.domain + '/search?filter=' + this.searchText 
+            }).success(function(data, status, headers, config) {
+                if (status == 200) {
+                    var ret = angular.fromJson(data);
+                    if(ret.error == 0) {
+                        $scope.searchResults = ret.keyList;
+                        $scope.showDropdown = $scope.searchResults.length > 0;
+                    }
+                }
+            });
+
+        };
+
         msgBus.onMsg('leaveSearchBox', $scope, $scope.leaveSearchBox);
     }])
     .controller('navCrl', ['$scope', '$log', function($scope, $log) {
