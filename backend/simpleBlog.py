@@ -308,7 +308,7 @@ class SavePost(SimpleBlog):
             writeFile(self.getFilename('md', postId, status), postContent)
             writeFile(self.getFilename('post', postId, status), self.genPostPage(postId, postContent, meta, isLatest and status == 'public'))
 
-            if isLatest and oldStatus != status:
+            if isLatest:
                 writeFile("%s/frontend/home.html" % (ProjectPath), self.genHomePage())
             if oldStatus != status:
                 writeFile('%s/frontend/archive.html' % (ProjectPath), self.genArchivePage())
