@@ -2,7 +2,6 @@ run/*
 logs/*
 backup/*
 frontend/*.*
-frontend/md/*
 frontend/post/*
 *.pyc
 *.pyo
