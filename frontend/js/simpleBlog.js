@@ -90,7 +90,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
             $scope.showIcon = false;
             $http({
                 method: 'GET', 
-                url: $scope.blogSetting.domain + '/search'
+                url: $scope.path + 'search'
             }).success(function(data, status, headers, config) {
                 if (status == 200) {
                     var ret = angular.fromJson(data);
