@@ -19,6 +19,12 @@ def buildBlog():
         writeFile("%s/frontend/about.html" % (ProjectPath), simpleBlog.genAboutPage())
         writeFile("%s/frontend/home.html" % (ProjectPath), simpleBlog.genHomePage())
         writeFile("%s/frontend/archive.html" % (ProjectPath), simpleBlog.genArchivePage())
+        mds = glob.glob("%s/frontend/md/*.md" % (ProjectPath))
+        for md in mds:
+            postId, meta, content = simpleBlog.getPostMeta(md)
+            writeFile(
+                    simpleBlog.getFilename('post', postId, 'public'), 
+                    simpleBlog.genPostPage(postId, content, meta, simpleBlog.isLatestPost(postId, 'public')))
     except:
         logging.info(traceback.format_exc())
 

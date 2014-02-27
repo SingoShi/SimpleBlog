@@ -304,7 +304,7 @@ class SavePost(SimpleBlog):
             status = meta['status'] if meta.has_key('status') else 'private'
             os.system('rm -rf %s/frontend/md/%s.md*' % (ProjectPath, postId))
             os.system('rm -rf %s/frontend/post/%s.html*' % (ProjectPath, postId))
-            isLatest =  self.isLatestPost(postId ,status)
+            isLatest =  self.isLatestPost(postId, status)
             writeFile(self.getFilename('md', postId, status), postContent)
             writeFile(self.getFilename('post', postId, status), self.genPostPage(postId, postContent, meta, isLatest and status == 'public'))
 
