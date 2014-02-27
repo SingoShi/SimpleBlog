@@ -127,7 +127,54 @@
         'error': int
     }
 
-## 5 RSS
+## 5 statistic
 
-### 5.1 RSS
+### 5.1 get total visit
+    URI: /visit
+    Method: GET
+    Success Return: {
+        'error': 0,
+        'result': {
+            'count': int
+        }
+    }
+    Error Return: {
+        'error': int
+    }
+
+### 5.2 get post visit
+
+    URI: /visit
+    Method: GET
+    URL Params: ?postId=***
+    Success Return: {
+        'error': 0,
+        'result': {
+            'count': int
+        }
+    }
+    Error Return: {
+        'error': int
+    }
+
+### 5.3 update visit count
+
+    URI: /visit
+    Method: PUT
+    Data Params: {
+        'postId': int
+    }
+    Success Return: {
+        'error': 0,
+        'result': {
+            'count': int
+        }
+    }
+    Error Return: {
+        'error': int
+    }
+
+## 6 RSS
+
+### 6.1 RSS
     

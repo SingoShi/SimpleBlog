@@ -379,3 +379,28 @@ class Search(SimpleBlog):
                             break 
         return json.dumps(ret)
 
+class Visit():
+    def GET(self):
+        web.header('Content-Type', 'application/json')
+        param = web.input()
+        postId = param["postId"] if param.has_key("postId") else "*"
+        files = glob.glob("%s/frontend/visit/%s.cnt" % (ProjectPath, postId))
+        cnt = 0
+        for file in files:
+            tmp = readFile(file)
+            cnt += int(tmp) if tmp else 0
+        return json.dumps({ 'error': 0, 'result': { 'count': cnt } })
+
+    def PUT(self):
+        web.header('Content-Type', 'application/json')
+        param = json.loads(web.data())
+        if param.has_key("postId"):
+            postId = param["postId"]
+            file = "%s/frontend/visit/%s.cnt" % (ProjectPath, postId)
+            tmp = readFile(file)
+            cnt = 1 + (int(tmp) if tmp else 0)
+            writeFile(file, str(cnt))
+            return json.dumps({ 'error': 0, 'result': { 'count': cnt } })
+        else:
+            return json.dumps(InputError)
+

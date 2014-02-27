@@ -3,6 +3,7 @@ logs/*
 backup/*
 frontend/*.*
 frontend/post/*
+frontend/visit/*
 *.pyc
 *.pyo
 *.swp

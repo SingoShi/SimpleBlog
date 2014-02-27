@@ -15,7 +15,8 @@ urls = (
     "/post/(.+).html", GetPostPage,
     "/archive.html", GetArchivePage,
     "/comment", Comment,
-    "/search", Search
+    "/search", Search,
+    "/visit", Visit,
 )
 
 app = web.application(urls, globals())

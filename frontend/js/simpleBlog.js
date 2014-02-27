@@ -19,7 +19,7 @@ var simpleBlogService = angular.module('SimpleBlog.service', [], function($provi
 
 var simpleBlog = angular.module('SimpleBlog', ['ngCookies', 'SimpleBlog.service', 'SimpleBlog.directive', 'SimpleBlog.filter'])
 
-simpleBlog.run(['$rootScope', function ($rootScope) {
+simpleBlog.run(['$rootScope', '$location', '$http', function ($rootScope, $location, $http) {
     var pageData = angular.element(document.querySelector('#pageData')).html();
     var blogSetting = angular.element(document.querySelector('#blogSetting')).html();
     $rootScope.pageData = angular.fromJson(pageData);
@@ -29,34 +29,33 @@ simpleBlog.run(['$rootScope', function ($rootScope) {
     } else {
         $rootScope.path = "";
     }
+    $rootScope.secureChannel = $location.protocol() == "https" && $rootScope.blogSetting.domain == $location.protocol() + "://" + $location.host();
+    $rootScope.sameDomain = $rootScope.blogSetting.domain.split("https://")[1] == $location.host();
+    
 }]);
 
 simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$cookies', 'msgBus', function($scope, $log, $http, $location, $cookies, msgBus) {
         $scope.showModel = false; 
         $scope.auth = $cookies.login ? true : false;
-        $scope.hostService = $scope.blogSetting.domain == $location.protocol() + "://" + $location.host();
-        $scope.showSearch = $scope.blogSetting.domain.split("https://")[1] == $location.host();
         $scope.login = function() {
-            if ($scope.hostService) {
+            if ($scope.secureChannel) {
                 $scope.showModel = true;
             }
         };
         $scope.logout = function() {
-            if ($scope.hostService) {
-                $http({
-                    method: 'GET', 
-                    url: $scope.blogSetting.domain + '/logout'
-                }).success(function(data, status, headers, config) {
-                    $scope.showModel = false;
-                    $scope.auth = false;
-                });
-            }
+            $http({
+                method: 'GET', 
+                url: $scope.path + 'logout'
+            }).success(function(data, status, headers, config) {
+                $scope.showModel = false;
+                $scope.auth = false;
+            });
         };
         $scope.cancelModal = function() {
             $scope.showModel = false;
         };
         $scope.signin = function() {
-            if ($scope.hostService) {
+            if ($scope.secureChannel) {
                 $http({
                     method: 'POST', 
                     data: angular.toJson({
@@ -106,7 +105,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
         $scope.textChange = function() {
             $http({
                 method: 'GET', 
-                url: $scope.blogSetting.domain + '/search?filter=' + this.searchText 
+                url: $scope.path  + 'search?filter=' + this.searchText 
             }).success(function(data, status, headers, config) {
                 if (status == 200) {
                     var ret = angular.fromJson(data);
@@ -151,7 +150,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
                         'postId': $scope.editPostId,
                         'postContent': this.editContent
                     }),
-                    url: $scope.blogSetting.domain + '/post'
+                    url: $scope.path + '/post'
                 }).success(function(data, status, headers, config) {
                     if (status == 200) {
                         ret = angular.fromJson(data);
@@ -226,7 +225,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
             $scope.resetPaging();
         }
     }])
-    .controller('postCrl', ['$scope', '$sce', '$log', '$element', function($scope, $sce, $log, $element) {
+    .controller('postCrl', ['$scope', '$sce', '$log', '$element', '$http', function($scope, $sce, $log, $element, $http) {
         if($scope.pageData.type == 'post') {
             if (!$scope.pageData.postId) {
                 $scope.showPost = false;
@@ -242,8 +241,22 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
                 $scope.commentsNum = $scope.pageData.commentsCount;
                 $scope.visitCount = $scope.pageData.visitCount;
                 $scope.showReply = false;
+                if ($scope.sameDomain) {
+                    $http({
+                        method: 'PUT', 
+                        data: angular.toJson({postId: $scope.pageData.postId}),
+                        url: $scope.path + 'visit'
+                    }).success(function(data, status, headers, config) {
+                        if (status == 200) {
+                            var ret = angular.fromJson(data);
+                            if(ret.error == 0 && ret.result) {
+                                $scope.post.visitCount = ret.result.count
+                            }
+                        }
+                    });
+                }
                 $scope.crtReplyView = function () {
-                    if(! $scope.showReply) {
+                    if(! $scope.showReply && $scope.sameDomain) {
                         $scope.showReply = true;
                         // TODO get comments
                     }
