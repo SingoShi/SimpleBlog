@@ -34,13 +34,15 @@ simpleBlog.run(['$rootScope', function ($rootScope) {
 simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$cookies', 'msgBus', function($scope, $log, $http, $location, $cookies, msgBus) {
         $scope.showModel = false; 
         $scope.auth = $cookies.login ? true : false;
+        $scope.hostService = $scope.blogSetting.domain == $location.protocol() + "://" + $location.host();
+        $scope.showSearch = $scope.blogSetting.domain.split("https://")[1] == $location.host();
         $scope.login = function() {
-            if ($scope.blogSetting.domain == $location.protocol() + "://" + $location.host()) {
+            if ($scope.hostService) {
                 $scope.showModel = true;
             }
         };
         $scope.logout = function() {
-            if ($scope.blogSetting.domain == $location.protocol() + "://" + $location.host()) {
+            if ($scope.hostService) {
                 $http({
                     method: 'GET', 
                     url: $scope.blogSetting.domain + '/logout'
@@ -54,7 +56,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
             $scope.showModel = false;
         };
         $scope.signin = function() {
-            if ($scope.blogSetting.domain == $location.protocol() + "://" + $location.host()) {
+            if ($scope.hostService) {
                 $http({
                     method: 'POST', 
                     data: angular.toJson({

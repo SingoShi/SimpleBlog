@@ -24,8 +24,8 @@
               ng-class="nav.selected"><a ng-href="{{nav.href}}">{{ nav.name }}</a></li>
           </ul>
         </div>
-        <div class="col-md-3 horizontal-no-padding" ng-controller="searchCrl">
-          <a class="glyphicon glyphicon-search pull-right" style="margin-top: 13px;" ng-show="showIcon" ng-click="clickSearchIcon()"></a>
+        <div class="col-md-3 horizontal-no-padding" ng-cloak ng-show="showSearch" ng-controller="searchCrl">
+          <a class="glyphicon glyphicon-search pull-right" style="margin-top: 13px;" ng-cloak ng-show="showIcon" ng-click="clickSearchIcon()"></a>
           <div class="dropdown pull-right" ng-cloak ng-hide="showIcon">
             <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search" ng-model="searchText" ng-change="textChange()"> 
             <ul class="dropdown-menu" ng-cloak ng-show="showDropdown" ng-click="leaveSearchBox()">
@@ -74,7 +74,7 @@
           <form class="form-inline" role="form">
             <div class="form-group col-md-2 reply-user">
               <label class="sr-only">name</label>
-              <input type="text" class="form-control" placeholder="Name" ng-model="username">
+              <input type="text" class="form-control" placeholder="Email" ng-model="email">
             </div>
             <div class="form-group col-md-9 reply-content">
               <label class="sr-only">reply</label>
