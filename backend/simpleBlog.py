@@ -45,6 +45,7 @@ def auth(func):
 class Setting():
     try:
         blogSetting = readFile("%s/setting/blogSetting.json" % (ProjectPath))
+        blogSettingObj = json.loads(blogSetting)
         cfgObj = json.loads(readFile("%s/setting/config.json" % (ProjectPath)))
         template = readFile("%s/template/template.html" % (ProjectPath))
         template = template.replace("%blogSetting%", blogSetting)
@@ -112,7 +113,6 @@ class SimpleBlog():
     def genPostPage(self, postId, content, meta, isLatest, path="../"):
         pagedata = {
             "postId": int(postId) if postId else 0,
-            "content": content,
             "type": "post",
             "latest": isLatest
         }
@@ -121,7 +121,8 @@ class SimpleBlog():
         pagedata["postTitle"] = meta["title"] if meta.has_key('title') else ""
         pagedata["postDate"] = meta["date"] if meta.has_key('date') else ""
         pagedata["status"] = meta["status"] if meta.has_key('status') else "private"
-        return Setting.template.replace("%path%", path).replace("%pageData%", json.dumps(pagedata))
+        page = Setting.template.replace("%path%", path).replace("%pageData%", json.dumps(pagedata))
+        return page.replace("%postMd%", content)
 
     def genAboutPage(self):
         about = json.dumps({
@@ -148,9 +149,9 @@ class SimpleBlog():
         if not postFile:
             return "", {}, ""
         postId = postFile.split('/')[-1].split('.')[0]
-        content = readFile(postFile).decode('utf-8')
+        content = readFile(postFile)
         md = Markdown(extensions=["meta"])
-        md.convert(content)
+        md.convert(content.decode('utf-8'))
         meta = self.genMeta(md.Meta)
         return postId, meta, content
 
@@ -238,6 +239,32 @@ class SimpleBlog():
         self.addIndex(Setting.index, meta, post)
         writeFile("%s/frontend/index.json" % (ProjectPath), json.dumps(Setting.index, indent=4))
 
+    def genSitemap(self):
+        sitemap = '''
+            <?xml version="1.0" encoding="UTF-8"?>
+            <urlset
+                  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+            {urlitems}
+            </urlset>
+        '''
+        urlitem = '''
+            <url>
+              <loc>http://{domain}/post/{postId}.html</loc>
+              <changefreq>daily</changefreq>
+            </url>
+        '''
+        urlitems = ''
+        files = glob.glob("%s/frontend/md/*.md" % (ProjectPath))
+        domain = Setting.blogSettingObj['domain']
+        if files:
+            for file in files:
+                postId = file.split('/')[-1].split('.')[0]
+                urlitems += urlitem.format(domain=domain, postId=postId)
+            writeFile("%s/frontend/sitemap.xml" % (ProjectPath), sitemap.format(urlitems=urlitems))
+
 ##################################################################################################
 
 class Login():
@@ -312,6 +339,7 @@ class SavePost(SimpleBlog):
                 writeFile("%s/frontend/home.html" % (ProjectPath), self.genHomePage())
             if oldStatus != status:
                 writeFile('%s/frontend/archive.html' % (ProjectPath), self.genArchivePage())
+                self.genSitemap()
             if oldStatus != status or oldMeta != meta:
                 self.updateIndex(oldMeta, 
                                  self.getFilename('md', postId, oldStatus),
@@ -403,4 +431,4 @@ class Visit():
             return json.dumps({ 'error': 0, 'result': { 'count': cnt } })
         else:
             return json.dumps(InputError)
-
+        

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:ng="http://angularjs.org" id="ng-app" ng-app="SimpleBlog">
   <head>
-    <title>{{ blogSetting.blogTitle }}</title>
+    <!-- <title>{{ blogSetting.blogTitle }}</title> -->
+    <title>Singo's Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="%path%css/bootstrap.min.css">
@@ -11,6 +12,16 @@
     <script src="%path%js/angular-cookies.min.js"></script>
     <script src="%path%js/markdown.js"></script>
     <script src="%path%js/simpleBlog.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-48511823-1', '162.243.140.80');
+      ga('send', 'pageview');
+
+    </script>
     <script type="text/ng-template" id="header.tpl">
       <div class="row">
         <h3 class="text-center title">To Be a <a ng-click="login()">S</a>imple <a ng-click="logout()">C</a>oder</h3>
@@ -130,6 +141,9 @@
   <xmp style="display: none" id="pageData">
     %pageData%
   </xmp>
+  <xmp style="display: none" id="postMd">
+    %postMd%
+  </xmp>
   <body>
     <div ng-controller="blogBodyCrl"
       ng-dblclick="leaveSearchBox()">
@@ -161,7 +175,8 @@
             ng-controller="editPostCrl">
           </div>
           <div class="row footer">
-            <p class="text-center" ng-cloak>Designed on Bootstrap by &copy; {{ blogSetting.blogOwner }}</p>
+            <p class="text-center" ng-cloak>Designed on Bootstrap by &copy; Singo</p>
+            <!-- <p class="text-center" ng-cloak>Designed on Bootstrap by &copy; {{ blogSetting.blogOwner }}</p> -->
           </div>
         </div>
         <div class="modal-div" 

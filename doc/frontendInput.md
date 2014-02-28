@@ -47,7 +47,6 @@ for pageData section `<xmp style="display: none" id="pageData">`, the schema dep
     {
         'type': 'post',
         'latest': true,
-        'content': 'the markdown text',
         'postDate': '2013/11/23'
         'postId': '222',
         'postTitle': 'this is test',
@@ -61,3 +60,7 @@ for pageData section `<xmp style="display: none" id="pageData">`, the schema dep
         'content': 'text',
         'postId': '222'
     }
+
+## postMd
+
+if type is post, postMd section `<xmp style="display: none" id="postMd">` which contains markdown text is included

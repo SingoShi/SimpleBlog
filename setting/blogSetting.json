@@ -1,5 +1,6 @@
 {
     "blogTitle": "Singo's Blog",
     "blogOwner": "Singo",
-    "domain": "https://162.243.140.80"
+    "domain": "162.243.140.80",
+    "protocol": "https"
 }

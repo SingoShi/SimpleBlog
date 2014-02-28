@@ -19,6 +19,7 @@ def buildBlog():
         writeFile("%s/frontend/about.html" % (ProjectPath), simpleBlog.genAboutPage())
         writeFile("%s/frontend/home.html" % (ProjectPath), simpleBlog.genHomePage())
         writeFile("%s/frontend/archive.html" % (ProjectPath), simpleBlog.genArchivePage())
+        simpleBlog.genSitemap()
         mds = glob.glob("%s/frontend/md/*.md" % (ProjectPath))
         for md in mds:
             postId, meta, content = simpleBlog.getPostMeta(md)

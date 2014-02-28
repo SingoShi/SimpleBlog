@@ -24,13 +24,17 @@ simpleBlog.run(['$rootScope', '$location', '$http', function ($rootScope, $locat
     var blogSetting = angular.element(document.querySelector('#blogSetting')).html();
     $rootScope.pageData = angular.fromJson(pageData);
     $rootScope.blogSetting = angular.fromJson(blogSetting);
+    if ($rootScope.pageData.type == "post") {
+        $rootScope.pageData.content = angular.element(document.querySelector('#postMd')).html().trim();
+    }
     if (window.location.pathname.split('/').length == 3) {
         $rootScope.path = "../";
     } else {
         $rootScope.path = "";
     }
-    $rootScope.secureChannel = $location.protocol() == "https" && $rootScope.blogSetting.domain == $location.protocol() + "://" + $location.host();
-    $rootScope.sameDomain = $rootScope.blogSetting.domain.split("https://")[1] == $location.host();
+    $rootScope.secureChannel = $location.protocol() == $rootScope.blogSetting.protocol && 
+                               $rootScope.blogSetting.domain == $location.host();
+    $rootScope.sameDomain = $rootScope.blogSetting.domain == $location.host();
     
 }]);
 
@@ -62,7 +66,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
                         'username': this.username,
                         'password': this.password
                     }),
-                    url: $scope.blogSetting.domain + '/login'
+                    url: $scope.blogSetting.protocol + '://' + $scope.blogSetting.domain + '/login'
                 }).success(function(data, status, headers, config) {
                     $scope.showModel = false;
                     if (status == 200) {
@@ -155,7 +159,7 @@ simpleBlog.controller('blogBodyCrl', ['$scope', '$log', '$http', '$location', '$
                     if (status == 200) {
                         ret = angular.fromJson(data);
                         if(ret.error == 0) {
-                            $window.location.replace($scope.blogSetting.domain + '/post/' + $scope.editPostId + '.html');
+                            $window.location.replace($scope.path + 'post/' + $scope.editPostId + '.html');
                         } else if (ret.error == 4) {
                             alert("Title, Date, Category, Tags are MUST fields; Status MUST be either private or public!");
                         } else{
