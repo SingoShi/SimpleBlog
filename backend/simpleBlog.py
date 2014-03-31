@@ -67,7 +67,7 @@ class SimpleBlog():
 
     def resetBlog(self):
         os.system("rm -rf %s/frontend/*.*" % (ProjectPath))
-     
+
     def getPostId(self):
         files = sorted(glob.glob("%s/frontend/post/*" % (ProjectPath)))
         if files:
@@ -77,9 +77,9 @@ class SimpleBlog():
         return str(id)
 
     def getFilename(self, type, postId, status):
-        return  "%s/frontend/%s/%s.%s%s" % (ProjectPath, 
-                                            type, postId, 
-                                            'html' if type == 'post' else 'md', 
+        return  "%s/frontend/%s/%s.%s%s" % (ProjectPath,
+                                            type, postId,
+                                            'html' if type == 'post' else 'md',
                                             '' if status == "public" else '_')
 
     def genEditPage(self, postId=None):
@@ -341,7 +341,7 @@ class SavePost(SimpleBlog):
                 writeFile('%s/frontend/archive.html' % (ProjectPath), self.genArchivePage())
                 self.genSitemap()
             if oldStatus != status or oldMeta != meta:
-                self.updateIndex(oldMeta, 
+                self.updateIndex(oldMeta,
                                  self.getFilename('md', postId, oldStatus),
                                  meta,
                                  self.getFilename('md', postId, status))
@@ -349,7 +349,7 @@ class SavePost(SimpleBlog):
         except:
             logging.error("SavePost get exception: %s", traceback.format_exc())
             return json.dumps(SaveError)
-        
+
 class GetPostPage(SimpleBlog):
     def GET(self, postId):
         web.header('Content-Type', 'text/html')
@@ -404,7 +404,7 @@ class Search(SimpleBlog):
                     for file in value:
                         if file.endswith('.md'):
                             ret['keyList'].append(keyword)
-                            break 
+                            break
         return json.dumps(ret)
 
 class Visit():
@@ -431,4 +431,4 @@ class Visit():
             return json.dumps({ 'error': 0, 'result': { 'count': cnt } })
         else:
             return json.dumps(InputError)
-        
+

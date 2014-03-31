@@ -29,8 +29,8 @@
       <div class="row navigation">
         <div class="col-md-9 horizontal-no-padding pull-left" ng-controller="navCrl">
           <ul class="nav nav-pills">
-            <li ng-repeat="nav in navSetting" 
-              ng-clock 
+            <li ng-repeat="nav in navSetting"
+              ng-clock
               ng-hide="nav.name == 'New' && !auth"
               ng-class="nav.selected"><a ng-href="{{nav.href}}">{{ nav.name }}</a></li>
           </ul>
@@ -38,9 +38,9 @@
         <div class="col-md-3 horizontal-no-padding" ng-cloak ng-show="sameDomain" ng-controller="searchCrl">
           <a class="glyphicon glyphicon-search pull-right" style="margin-top: 13px;" ng-cloak ng-show="showIcon" ng-click="clickSearchIcon()"></a>
           <div class="dropdown pull-right" ng-cloak ng-hide="showIcon">
-            <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search" ng-model="searchText" ng-change="textChange()"> 
+            <input type="text" class="form-control" style="margin-top: 7px;" placeholder="Search" ng-model="searchText" ng-change="textChange()">
             <ul class="dropdown-menu" ng-cloak ng-show="showDropdown" ng-click="leaveSearchBox()">
-              <li ng-repeat="result in searchResults"><a ng-href="%path%archive.html?filter={{ result }}">{{ result }}</a></li>
+              <li ng-repeat="result in searchResults"><a ng-href="%path%archive.html?filter={{ result | escape }}">{{ result }}</a></li>
             </ul>
           </div>
         </div>
@@ -75,7 +75,7 @@
         <p>
           <span ng-cloak ng-show="auth">| <a ng-href="{{editURI}}">Edit</a></span>
           <span>| Post on {{post.postDate}}</span>
-          <span ng-show="post.visitCount">| Visit({{post.visitCount}})</span> 
+          <span ng-show="post.visitCount">| Visit({{post.visitCount}})</span>
           <span>| <a ng-click="crtReplyView()">Reply</a></span>
           |
         </p>
@@ -96,7 +96,7 @@
             </div>
           </form>
         </div>
-        <div class="row" 
+        <div class="row"
           ng-repeat="comment in comments"
           ng-class="{comments: !$last, comments-noborder: $last}">
           <div class="comment-main col-md-11">
@@ -106,7 +106,7 @@
           <div class="comment-reply col-md-1 horizontal-no-padding">
             <button class="btn btn-default" ng-click="replyUser()">Reply</button>
           </div>
-        </div>     
+        </div>
       </div>
     </script>
     <script type="text/ng-template" id="modal.tpl">
@@ -148,30 +148,30 @@
     <div ng-controller="blogBodyCrl"
       ng-dblclick="leaveSearchBox()">
         <div class="container">
-          <div class="header" 
+          <div class="header"
             ng-include="'header.tpl'"></div>
-          <div class="about" 
-            ng-cloak 
+          <div class="about"
+            ng-cloak
             ng-show="pageData.type == 'about'"
             ng-bind-html="about"
             ng-controller="aboutCrl">
           </div>
-          <div class="post" 
-            ng-cloak 
+          <div class="post"
+            ng-cloak
             ng-show="pageData.type == 'post'"
-            ng-include="'post.tpl'" 
+            ng-include="'post.tpl'"
             ng-controller="postCrl">
           </div>
-          <div class="archives" 
-            ng-cloak 
+          <div class="archives"
+            ng-cloak
             ng-show="pageData.type == 'archive'"
-            ng-include="'archive.tpl'" 
+            ng-include="'archive.tpl'"
             ng-controller="archiveCrl">
           </div>
-          <div class="edit-post" 
-            ng-cloak 
-            ng-show="pageData.type == 'edit'" 
-            ng-include="'edit.tpl'" 
+          <div class="edit-post"
+            ng-cloak
+            ng-show="pageData.type == 'edit'"
+            ng-include="'edit.tpl'"
             ng-controller="editPostCrl">
           </div>
           <div class="row footer">
@@ -179,8 +179,8 @@
             <!-- <p class="text-center" ng-cloak>Designed on Bootstrap by &copy; {{ blogSetting.blogOwner }}</p> -->
           </div>
         </div>
-        <div class="modal-div" 
-          ng-cloak 
+        <div class="modal-div"
+          ng-cloak
           ng-show="showModel"
           ng-include="'modal.tpl'">
         </div>
