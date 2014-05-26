@@ -42,7 +42,7 @@ a:hover, a:focus {
 
 .navigation {
     border-top: 1px solid #DDD;
-    border-bottom: 1px solid #DDD;  
+    border-bottom: 1px solid #DDD;
     font-size: 20px;
 }
 
@@ -78,26 +78,6 @@ a:hover, a:focus {
 .post-body {
     padding-top: 10px;
     padding-bottom: 10px;
-}
-
-.post-body h1
-,.about h1 {
-    font-size: 20px;
-}
-
-.post-body h2
-,.about h2 {
-    font-size: 18px;
-}
-
-.post-body h3
-,.about h3 {
-    font-size: 16px;
-}
-
-.post-body h4,
-.about h4 {
-    font-size: 14px;
 }
 
 .post-footer {
@@ -201,7 +181,7 @@ a:hover, a:focus {
     filter:alpha(opacity=40);       /* IE */
     -moz-opacity:0.4;              /* Mozilla */
     -khtml-opacity:0.4;              /* Safari */
-    opacity: 0.4;  
+    opacity: 0.4;
     position:absolute;
     left: 0;
     top: 0;

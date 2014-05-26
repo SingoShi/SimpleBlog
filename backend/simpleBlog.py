@@ -184,7 +184,7 @@ class SimpleBlog():
             for file in files:
                 self.genArchiveObj(file, archives)
             archives = archives['archives']
-        pagedata["archives"] = archives
+        pagedata["archives"] = sorted(archives, key=lambda obj: obj["postDate"])
         return Setting.template.replace("%path%", "").replace("%pageData%", json.dumps(pagedata))
 
     def addIndex(self, index, meta, file):
